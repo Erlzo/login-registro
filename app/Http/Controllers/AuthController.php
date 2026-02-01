@@ -9,78 +9,62 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    /**
-     * Show the registration form.
-     */
     public function showRegister()
     {
         return view('auth.register');
     }
 
-    /**
-     * Handle user registration.
-     */
     public function register(Request $request)
     {
-        $validated = $request->validate([
-            'username' => 'required|string|unique:users|max:255',
-            'name' => 'required|string|max:255',
-            'lastname' => 'required|string|max:255',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
+        $username = $request->input('username');
+        $name = $request->input('name');
+        $lastname = $request->input('lastname');
+        $email = $request->input('email');
+        $password = $request->input('password');
 
-        $user = User::create([
-            'username' => $validated['username'],
-            'name' => $validated['name'],
-            'lastname' => $validated['lastname'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-            'role' => 'user', // Default role
-        ]);
+        // Ver si ya existe
+        $existe = User::where('email', $email)->first();
+        if ($existe) {
+            return back()->with('error', 'Email ya registrado');
+        }
 
-        Auth::login($user);
+        // Crear usuario
+        $user = new User();
+        $user->username = $username;
+        $user->name = $name;
+        $user->lastname = $lastname;
+        $user->email = $email;
+        $user->password = Hash::make($password);
+        $user->role = 'user';
+        $user->save();
 
-        return redirect()->route('dashboard')->with('success', 'Registro completado exitosamente.');
+        return redirect('/login')->with('success', 'Usuario registrado');
     }
 
-    /**
-     * Show the login form.
-     */
     public function showLogin()
     {
         return view('auth.login');
     }
 
-    /**
-     * Handle user login.
-     */
     public function login(Request $request)
     {
-        $credentials = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|string',
-        ]);
+        $email = $request->input('email');
+        $password = $request->input('password');
 
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-            return redirect()->route('dashboard')->with('success', 'Sesión iniciada correctamente.');
+        // Buscar usuario
+        $user = User::where('email', $email)->first();
+
+        if ($user && Hash::check($password, $user->password)) {
+            Auth::login($user);
+            return redirect('/dashboard')->with('success', 'Login ok');
+        } else {
+            return back()->with('error', 'Email o contraseña incorrectos');
         }
-
-        return back()->withErrors([
-            'email' => 'Las credenciales no coinciden con nuestros registros.',
-        ])->onlyInput('email');
     }
 
-    /**
-     * Handle user logout.
-     */
     public function logout(Request $request)
     {
         Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return redirect('/')->with('success', 'Sesión cerrada correctamente.');
+        return redirect('/')->with('success', 'Sesión cerrada');
     }
 }

@@ -3,64 +3,42 @@
 @section('title', 'Registro')
 
 @section('content')
-<div class="container">
-    <div class="card">
-        <h1>Crear Cuenta</h1>
+<div>
+    <h1>Registrarse</h1>
+    
+    <form action="/register" method="POST">
+        @csrf
         
-        <form action="{{ route('register') }}" method="POST">
-            @csrf
-            
-            <div class="form-group">
-                <label for="username">Usuario:</label>
-                <input type="text" id="username" name="username" value="{{ old('username') }}" required>
-                @error('username')
-                    <div class="error">{{ $message }}</div>
-                @enderror
-            </div>
-
-            <div class="form-group">
-                <label for="name">Nombre:</label>
-                <input type="text" id="name" name="name" value="{{ old('name') }}" required>
-                @error('name')
-                    <div class="error">{{ $message }}</div>
-                @enderror
-            </div>
-
-            <div class="form-group">
-                <label for="lastname">Apellidos:</label>
-                <input type="text" id="lastname" name="lastname" value="{{ old('lastname') }}" required>
-                @error('lastname')
-                    <div class="error">{{ $message }}</div>
-                @enderror
-            </div>
-
-            <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" value="{{ old('email') }}" required>
-                @error('email')
-                    <div class="error">{{ $message }}</div>
-                @enderror
-            </div>
-
-            <div class="form-group">
-                <label for="password">Contraseña:</label>
-                <input type="password" id="password" name="password" required>
-                @error('password')
-                    <div class="error">{{ $message }}</div>
-                @enderror
-            </div>
-
-            <div class="form-group">
-                <label for="password_confirmation">Confirmar Contraseña:</label>
-                <input type="password" id="password_confirmation" name="password_confirmation" required>
-            </div>
-
-            <button type="submit">Registrarse</button>
-        </form>
-
-        <div class="links">
-            ¿Ya tienes cuenta? <a href="{{ route('login') }}">Inicia sesión aquí</a>
+        <div>
+            <label>Usuario:</label>
+            <input type="text" name="username" required>
         </div>
-    </div>
+
+        <div>
+            <label>Nombre:</label>
+            <input type="text" name="name" required>
+        </div>
+
+        <div>
+            <label>Apellidos:</label>
+            <input type="text" name="lastname" required>
+        </div>
+
+        <div>
+            <label>Email:</label>
+            <input type="email" name="email" required>
+        </div>
+
+        <div>
+            <label>Contraseña:</label>
+            <input type="password" name="password" required>
+        </div>
+
+        <button type="submit">Registrarse</button>
+    </form>
+
+    <p>
+        ¿Ya tienes cuenta? <a href="/login">Inicia sesión</a>
+    </p>
 </div>
 @endsection
